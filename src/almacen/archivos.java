@@ -8,6 +8,7 @@ import informacion.convertir;
 import informacion.datos;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -26,6 +27,7 @@ public class archivos {
     public List<datos> leer(){
         String linea;
         datos datos;
+        if (verificar()){
         try { 
             FileReader archivo = new FileReader("datos.vic");
             BufferedReader br = new BufferedReader(archivo);
@@ -33,26 +35,31 @@ public class archivos {
                 datos = new datos();
                 convertir convertir = new convertir();
                 datos = convertir.aclase(linea);
-                contenido.add(datos);
-                
-                
+                contenido.add(datos);               
             }
             br.close();
             archivo.close();
+            if (!(contenido.size()>0)){
+                contenido = null;
+            }
         } catch (FileNotFoundException ex) {
            ex.printStackTrace();
         } catch (IOException ex) {
            ex.printStackTrace();
         }
+        }else{
+            contenido = null;
+        }
         return contenido;
-    
+        
 }
-    public boolean grabar(datos cadena){
+    public boolean grabar(List<datos> lista){
         convertir convertir = new convertir();
         boolean estado = true;
         try {
-            FileWriter archivo = new FileWriter("datos.vic",true);
+            FileWriter archivo = new FileWriter("datos.vic");
             BufferedWriter bw = new BufferedWriter(archivo);
+            for (datos cadena : lista)
             bw.write(convertir.ajson(cadena)+"\n");
             bw.close();
             archivo.close();
@@ -63,5 +70,11 @@ public class archivos {
         }
         return estado;
     }
-
+   private boolean verificar(){
+       File archivo = new File("datos.vic");
+       if (archivo.exists())
+           return true;
+       else
+           return false;
+   }
 }

@@ -7,10 +7,13 @@ package p2ehvm4s21;
 import almacen.archivos;
 import informacion.datos;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -23,18 +26,20 @@ public class JFprincipal extends javax.swing.JFrame {
     /**
      * Creates new form JFprincipal
      */
-    
-          List<datos> lista = new ArrayList<>();
-      
+    int estadoG = 0;
+    List<datos> lista = new ArrayList<>();
+    int fila = 0;
+
     public JFprincipal() {
         initComponents();
 
         btmgrabar.setEnabled(false);
         btmcancelar.setEnabled(false);
+        estadotxt(false);
         archivos archivo = new archivos();
         lista = archivo.leer();
-         CargarDatos();
-
+        CargarDatos();
+        estadotxt(false);
     }
 
     /**
@@ -58,6 +63,8 @@ public class JFprincipal extends javax.swing.JFrame {
         btmgrabar = new javax.swing.JButton();
         btmcancelar = new javax.swing.JButton();
         dcfecha = new com.toedter.calendar.JDateChooser();
+        btmeditar = new javax.swing.JButton();
+        btmeliminar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -73,6 +80,11 @@ public class JFprincipal extends javax.swing.JFrame {
                 "NOMBRE", "FECHA DE  NACIMIENTO", "CURP"
             }
         ));
+        tabladatos.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tabladatosMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tabladatos);
 
         jLabel2.setText("INGRESE SU NOMBRE:");
@@ -80,6 +92,12 @@ public class JFprincipal extends javax.swing.JFrame {
         jLabel3.setText("INGRESE SU FECHA DE NACIMINTO DD/MM/AA :");
 
         jLabel4.setText("INGRESE SU CURP:");
+
+        txtnombre.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtnombreActionPerformed(evt);
+            }
+        });
 
         btmnuevo.setText("NUEVO");
         btmnuevo.addActionListener(new java.awt.event.ActionListener() {
@@ -102,6 +120,20 @@ public class JFprincipal extends javax.swing.JFrame {
             }
         });
 
+        btmeditar.setText("EDITAR");
+        btmeditar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btmeditarActionPerformed(evt);
+            }
+        });
+
+        btmeliminar.setText("ELIMINAR");
+        btmeliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btmeliminarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -112,22 +144,24 @@ public class JFprincipal extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(txtnombre, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(txtcurp)))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(txtcurp, javax.swing.GroupLayout.PREFERRED_SIZE, 419, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 320, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(dcfecha, javax.swing.GroupLayout.PREFERRED_SIZE, 267, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(64, 64, 64)
+                        .addComponent(dcfecha, javax.swing.GroupLayout.PREFERRED_SIZE, 267, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(6, 6, 6))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
+                        .addComponent(txtnombre, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btmeliminar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btmeditar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btmcancelar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btmgrabar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btmnuevo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -163,7 +197,10 @@ public class JFprincipal extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(11, 11, 11)
                                 .addComponent(dcfecha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btmeditar)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
+                .addComponent(btmeliminar))
         );
 
         pack();
@@ -171,26 +208,56 @@ public class JFprincipal extends javax.swing.JFrame {
 
     private void btmgrabarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btmgrabarActionPerformed
         // TODO add your handling code here:
-         Date fecha = this.dcfecha.getDate();
-         DateFormat Formato = new SimpleDateFormat("dd-MM-yyyy");
-         String fechafinal = Formato.format(fecha);
-            datos datos = new datos(txtnombre.getText(),fechafinal,txtcurp.getText());
-        archivos archivos = new archivos();
-        if (archivos.grabar(datos))
-            JOptionPane.showMessageDialog(null, "se grabo con exito", "informacion", JOptionPane.INFORMATION_MESSAGE);
-        else
-             JOptionPane.showMessageDialog(null, "error al  grabo", "informacion", JOptionPane.ERROR_MESSAGE);
-        btmnuevo.setEnabled(true);
-        btmgrabar.setEnabled(false);
-        btmcancelar.setEnabled(false);
-         lista = archivos.leer();
-         CargarDatos();
+        if (estadoG == 1) {
+
+            Date fecha = this.dcfecha.getDate();
+            DateFormat Formato = new SimpleDateFormat("dd-MM-yyyy");
+            String fechafinal = Formato.format(fecha);
+            datos datos = new datos(txtnombre.getText(), fechafinal, txtcurp.getText());
+            if (lista == null) {
+                lista = new ArrayList<>();
+            }
+            lista.add(datos);
+            archivos archivos = new archivos();
+            if (archivos.grabar(lista)) {
+                JOptionPane.showMessageDialog(null, "se grabo con exito", "informacion", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "error al  grabo", "informacion", JOptionPane.ERROR_MESSAGE);
+            }
+            btmnuevo.setEnabled(true);
+            btmgrabar.setEnabled(false);
+            btmcancelar.setEnabled(false);
+            btmeditar.setEnabled(true);
+            btmeliminar.setEnabled(true);
+
+            lista = archivos.leer();
+            CargarDatos();
+            estadotxt(false);
+        }
+        if (estadoG == 2) {
+            Date fecha = this.dcfecha.getDate();
+            DateFormat Formato = new SimpleDateFormat("dd-MM-yyyy");
+            String fechafinal = Formato.format(fecha);
+            datos datos = new datos(txtnombre.getText(), fechafinal, txtcurp.getText());
+            lista.set(fila, datos);
+            archivos archivos = new archivos();
+            if (archivos.grabar(lista)) {
+                JOptionPane.showMessageDialog(null, "se actualizo con exito", "informacion", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "error al  actualizar", "informacion", JOptionPane.ERROR_MESSAGE);
+            }
+            lista = archivos.leer();
+            CargarDatos();
+            estadotxt(false);
+        }
     }//GEN-LAST:event_btmgrabarActionPerformed
 
     private void btmcancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btmcancelarActionPerformed
         btmgrabar.setEnabled(false);
         tabladatos.setEnabled(false);
         btmnuevo.setEnabled(true);
+        estadotxt(false);
+        btmcancelar.setEnabled(false);
     }//GEN-LAST:event_btmcancelarActionPerformed
 
     private void btmnuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btmnuevoActionPerformed
@@ -200,7 +267,59 @@ public class JFprincipal extends javax.swing.JFrame {
         btmnuevo.setEnabled(false);
         btmgrabar.setEnabled(true);
         btmcancelar.setEnabled(true);
+        estadotxt(true);
+        estadoG = 1; //definimos el valor 1 para guardar uno nuevo
     }//GEN-LAST:event_btmnuevoActionPerformed
+
+    private void tabladatosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabladatosMouseClicked
+        try {
+            // TODO add your handling code here:
+
+            int fila = tabladatos.getSelectedRow();
+
+            JOptionPane.showMessageDialog(null, "fila: " + fila);
+            txtnombre.setText(String.valueOf(tabladatos.getValueAt(fila, 0)));
+
+            SimpleDateFormat sdformato = new SimpleDateFormat("dd-MM-yyyy");
+            String fecha = (String) tabladatos.getValueAt(fila, 1);
+            dcfecha.setDate(sdformato.parse(fecha));
+
+            txtcurp.setText(String.valueOf(tabladatos.getValueAt(fila, 2)));
+        } catch (ParseException ex) {
+            Logger.getLogger(JFprincipal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }//GEN-LAST:event_tabladatosMouseClicked
+
+    private void btmeditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btmeditarActionPerformed
+        // TODO add your handling code here:
+        estadotxt(true);
+        btmnuevo.setEnabled(false);
+        btmgrabar.setEnabled(true);
+        btmcancelar.setEnabled(true);
+        btmeditar.setEnabled(false);
+        btmeliminar.setEnabled(false);
+        estadotxt(true);
+        estadoG = 2; //asignamos el v alor para guardar el registro 2
+    }//GEN-LAST:event_btmeditarActionPerformed
+
+    private void btmeliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btmeliminarActionPerformed
+        // TODO add your handling code here:
+        int respuesta = JOptionPane.showConfirmDialog(null, "DESEAS ELIMINAR EL REGISTRO", "ELIMINAR", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+        if (respuesta == JOptionPane.YES_OPTION) {
+            lista.remove(fila);
+
+            archivos archivo = new archivos();
+            archivo.grabar(lista);
+            lista = archivo.leer();
+            CargarDatos();
+            estadotxt(false);
+        }
+    }//GEN-LAST:event_btmeliminarActionPerformed
+
+    private void txtnombreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtnombreActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtnombreActionPerformed
 
     /**
      * @param args the command line arguments
@@ -236,24 +355,34 @@ public class JFprincipal extends javax.swing.JFrame {
             }
         });
     }
-     private void CargarDatos(){
-          DefaultTableModel modelotabla = new DefaultTableModel();
-          modelotabla.addColumn("nombre");
-          modelotabla.addColumn("fechadenacimiento");
-          modelotabla.addColumn("curp");
-          tabladatos.setModel(modelotabla);
-        DefaultTableModel tabla = (DefaultTableModel) this.tabladatos.getModel();                
-        for (datos datos:lista){
-        Object fila[] =new Object[] {datos.getnombre(),datos.getfechadenacimiernto(),datos.getcurp()};
-        tabla.addRow(fila);
 
-     
+    private void CargarDatos() {
+        DefaultTableModel modelotabla = new DefaultTableModel();
+        modelotabla.addColumn("nombre");
+        modelotabla.addColumn("fechadenacimiento");
+        modelotabla.addColumn("curp");
+        tabladatos.setModel(modelotabla);
+        DefaultTableModel tabla = (DefaultTableModel) this.tabladatos.getModel();
+        if (lista != null) {
+            for (datos datos : lista) {
+                Object fila[] = new Object[]{datos.getnombre(), datos.getfechadenacimiernto(), datos.getcurp()};
+                tabla.addRow(fila);
+
+            }
         }
-        
+
+    }
+
+    private void estadotxt(boolean estado) {
+        txtnombre.setEnabled(estado);
+        dcfecha.setEnabled(estado);
+        txtcurp.setEnabled(estado);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btmcancelar;
+    private javax.swing.JButton btmeditar;
+    private javax.swing.JButton btmeliminar;
     private javax.swing.JButton btmgrabar;
     private javax.swing.JButton btmnuevo;
     private com.toedter.calendar.JDateChooser dcfecha;
@@ -267,5 +396,4 @@ public class JFprincipal extends javax.swing.JFrame {
     private javax.swing.JTextField txtnombre;
     // End of variables declaration//GEN-END:variables
 
-   
 }
